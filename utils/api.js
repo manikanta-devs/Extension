@@ -1,7 +1,7 @@
 'use strict';
 
 const API_CONFIG = {
-  baseUrl: 'http://localhost:3000',
+  baseUrl: window.AI_COPILOT_API_BASE_URL || 'http://localhost:3000',
   endpoint: '/generate',
   timeoutMs: 30000,
 };
@@ -37,7 +37,9 @@ async function callAI(prompt, context = '', action = 'custom') {
   let data = {};
   try {
     data = await response.json();
-  } catch (_) {}
+  } catch (_) {
+    // Non-JSON responses are handled by the fallback error message below.
+  }
 
   if (!response.ok || !data.success) {
     throw new Error(data.message || 'Could not reach backend. Make sure the server is running.');
