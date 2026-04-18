@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Life Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ── HEADER ─────────────────────────────────────── -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-orb">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" fill="currentColor"/>
+            <circle cx="19" cy="4" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="5" cy="19" r="1.5" fill="currentColor" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="logo-text-wrap">
+          <span class="logo-name">AI Life Copilot</span>
+          <span class="logo-tag">Neural Assistant</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="status-dot" id="statusDot" title="Extension active"></div>
+        <label class="toggle-pill" title="Enable / Disable extension">
+          <input type="checkbox" id="extensionToggle" checked />
+          <span class="pill-track">
+            <span class="pill-thumb"></span>
+          </span>
+        </label>
+      </div>
+    </header>
+
+    <!-- ── CONSENT BANNER ─────────────────────────────── -->
+    <div class="consent-banner" id="consentBanner" hidden>
+      <div class="consent-icon">🔒</div>
+      <div class="consent-body">
+        <strong>Permission needed</strong>
+        <p>Allow AI Copilot to read this page's content to provide contextual assistance?</p>
+      </div>
+      <div class="consent-actions">
+        <button class="btn btn-cyan btn-sm" id="consentAllow">Allow</button>
+        <button class="btn btn-ghost btn-sm" id="consentDeny">Deny</button>
+      </div>
+    </div>
+
+    <!-- ── PAGE CONTEXT BADGE ─────────────────────────── -->
+    <div class="context-strip" id="contextStrip">
+      <span class="context-pulse"></span>
+      <span class="context-icon" id="ctxIcon">🌐</span>
+      <span class="context-text" id="ctxLabel">Analyzing page...</span>
+      <span class="context-type-badge" id="ctxBadge">—</span>
+    </div>
+
+    <!-- ── QUICK ACTIONS ──────────────────────────────── -->
+    <div class="section-label">Quick Actions</div>
+    <div class="actions-grid" id="actionsGrid">
+
+      <button class="action-card" id="btnAnalyze" data-action="analyze">
+        <div class="card-icon-wrap cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </div>
+        <span class="card-label">Analyze Page</span>
+        <span class="card-sub">AI page insights</span>
+      </button>
+
+      <button class="action-card" id="btnReply" data-action="reply">
+        <div class="card-icon-wrap purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <span class="card-label">Generate Reply</span>
+        <span class="card-sub">Smart responses</span>
+      </button>
+
+      <button class="action-card" id="btnTransform" data-action="transform">
+        <div class="card-icon-wrap teal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <span class="card-label">Transform Text</span>
+        <span class="card-sub">Rewrite & improve</span>
+      </button>
+
+      <button class="action-card" id="btnSuggest" data-action="suggest">
+        <div class="card-icon-wrap amber">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <span class="card-label">What Should I Do?</span>
+        <span class="card-sub">Get suggestions</span>
+      </button>
+
+    </div>
+
+    <!-- ── TRANSFORM SUBMENU ───────────────────────────── -->
+    <div class="submenu" id="transformSubmenu" hidden>
+      <div class="submenu-label">Transform selected / page text as:</div>
+      <div class="submenu-chips">
+        <button class="chip" data-transform="summarize">📝 Summarize</button>
+        <button class="chip" data-transform="linkedin">💼 LinkedIn Post</button>
+        <button class="chip" data-transform="caption">📸 Caption</button>
+        <button class="chip" data-transform="tweet">🐦 Tweet Thread</button>
+        <button class="chip" data-transform="formal">🎩 Make Formal</button>
+        <button class="chip" data-transform="casual">😊 Make Casual</button>
+      </div>
+    </div>
+
+    <!-- ── CUSTOM PROMPT ──────────────────────────────── -->
+    <div class="prompt-wrap">
+      <textarea
+        id="customPrompt"
+        class="prompt-input"
+        placeholder="Ask anything about this page…"
+        rows="2"
+        maxlength="500"
+      ></textarea>
+      <div class="prompt-footer">
+        <span class="char-count" id="charCount">0 / 500</span>
+        <button class="btn btn-cyan btn-send" id="btnSendPrompt" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Send
+        </button>
+      </div>
+    </div>
+
+    <!-- ── LOADING ─────────────────────────────────────── -->
+    <div class="loading-bar" id="loadingBar" hidden>
+      <div class="loading-inner">
+        <div class="neural-spinner">
+          <div class="ns-ring"></div>
+          <div class="ns-ring ns-ring-2"></div>
+          <div class="ns-dot"></div>
+        </div>
+        <span class="loading-text" id="loadingText">Neural network processing…</span>
+      </div>
+    </div>
+
+    <!-- ── RESPONSE AREA ───────────────────────────────── -->
+    <div class="response-panel" id="responsePanel" hidden>
+      <div class="response-header">
+        <div class="response-title-row">
+          <span class="response-label">AI Response</span>
+          <div class="model-badge">gemini-pro</div>
+        </div>
+        <div class="response-toolbar">
+          <button class="tool-btn" id="btnCopy" title="Copy response">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+          <button class="tool-btn" id="btnInsert" title="Insert into page">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+            Insert
+          </button>
+          <button class="tool-btn tool-btn-close" id="btnClearResponse" title="Clear">✕</button>
+        </div>
+      </div>
+      <div class="response-body" id="responseBody"></div>
+    </div>
+
+    <!-- ── FOOTER ──────────────────────────────────────── -->
+    <footer class="footer">
+      <span class="footer-version">v1.0.0</span>
+      <span class="footer-hint">
+        <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> to toggle
+      </span>
+    </footer>
+
+  </div>
+
+  <!-- ── TOAST ──────────────────────────────────────────── -->
+  <div class="toast-stack" id="toastStack"></div>
+
+  <script src="utils/api.js"></script>
+  <script src="popup.js"></script>
+
+</body>
+</html>
