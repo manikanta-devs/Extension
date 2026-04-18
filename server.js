@@ -23,7 +23,7 @@ const helmet       = require('helmet');
 const cors         = require('cors');
 const rateLimit    = require('express-rate-limit');
 
-const generateRoute = require('./routes/generate');
+const generateRoute = require('./generate');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;

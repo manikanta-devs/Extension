@@ -18,7 +18,7 @@
 const express  = require('express');
 const router   = express.Router();
 const validator = require('validator');
-const { generateAIResponse } = require('../utils/ai');
+const { generateAIResponse } = require('./ai');
 
 // ── CONSTANTS ─────────────────────────────────────────────────────
 const LIMITS = {
